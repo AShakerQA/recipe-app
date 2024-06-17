@@ -82,13 +82,18 @@ const App = () => {
             <button type="submit">Submit</button>
           </form>
 
-          {recipes.map((recipe) => (
+          {recipes.map((recipe) => {
+            const isFavourite = favouriteRecipes.some(
+              (favRecipe) => recipe.id === favRecipe.id
+            );
+
             <RecipeCard
               recipe={recipe}
               onClick={() => setSelectedRecipe(recipe)}
               onFavouriteButtonClick={addFavouriteRecipe}
-            />
-          ))}
+              isFavourite={true}
+            />;
+          })}
           <button className="view-more-button" onClick={handleViewMoreClick}>
             View More
           </button>
