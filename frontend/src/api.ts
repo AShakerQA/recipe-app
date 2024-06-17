@@ -27,12 +27,31 @@ export const getRecipeSummary = async (recipeId: string) => {
 };
 
 export const getFavouriteRecipes = async () => {
-  const url = new URL("http://localhost:5000/api/recipes/favourite");
-  const response = await fetch(url);
+  const baseUrl = new URL("http://localhost:5000/api/recipes/favourite");
+  const response = await fetch(baseUrl);
 
   if (!response.ok) {
     throw new Error(`HTTP error! Status: ${response.status}`);
   }
 
   return response.json();
+};
+
+export const addFavouriteRecipe = async (recipe: Recipe) => {
+  const baseUrl = new URL("http://localhost:5000/api/recipes/favourite");
+  const body = {
+    recipeId: recipe.id,
+  };
+
+  const response = await fetch(baseUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! Status: ${response.status}`);
+  }
 };

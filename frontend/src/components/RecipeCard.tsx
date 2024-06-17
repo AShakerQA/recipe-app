@@ -3,14 +3,20 @@ import { Recipe } from "../types";
 interface Props {
   recipe: Recipe;
   onClick: () => void;
+  onFavouriteButtonClick: (recipe: Recipe) => void;
 }
 
-const RecipeCard = ({ recipe, onClick }: Props) => {
+const RecipeCard = ({ recipe, onClick, onFavouriteButtonClick }: Props) => {
   return (
     <div className="recipe-card" onClick={onClick}>
       <img src={recipe.image} />
       <div className="recipe-card-title">
-        <span>
+        <span
+          onClick={(event) => {
+            event.stopPropagation(); //ignore RecipeCard onClick
+            onFavouriteButtonClick(recipe);
+          }}
+        >
           <AiOutlineHeart size={25} />
         </span>
         <h3>{recipe.title}</h3>
