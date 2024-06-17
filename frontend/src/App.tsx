@@ -4,6 +4,7 @@ import { Recipe } from "./types";
 import RecipeCard from "./components/RecipeCard";
 import "./App.css";
 import RecipeModal from "./components/RecipeModal";
+import { AiOutlineSearch } from "react-icons/ai";
 
 type Tabs = "search" | "favourites"; //only two types of tabs
 
@@ -34,7 +35,6 @@ const App = () => {
     event.preventDefault();
     try {
       const recipes = await api.searchRecipes(searchTerm, 1);
-
       setRecipes(recipes.results);
       pageNumber.current = 1;
     } catch (error) {
@@ -46,7 +46,6 @@ const App = () => {
     const nextPage = pageNumber.current + 1;
     try {
       const nextRecipes = await api.searchRecipes(searchTerm, nextPage);
-
       setRecipes([...recipes, ...nextRecipes.results]); //append new page to existing fetched recipes
       pageNumber.current = nextPage;
     } catch (error) {
@@ -76,38 +75,60 @@ const App = () => {
   };
 
   return (
-    <div>
-      <div className="tabs">
-        <h1 onClick={() => setSelectedTab("search")}>Recipe Search</h1>
-        <h1 onClick={() => setSelectedTab("favourites")}>Favourites</h1>
+    <div className="app-container">
+      <div className="header">
+        <img src="/hero-image.jpg"></img>
+        <div className="title">My Recipe App</div>
       </div>
+      <div className="tabs">
+        <h1
+          className={selectedTab === "search" ? "tab-active" : ""}
+          onClick={() => setSelectedTab("search")}
+        >
+          Recipe Search
+        </h1>
+        <h1
+          className={selectedTab === "favourites" ? "tab-active" : ""}
+          onClick={() => setSelectedTab("favourites")}
+        >
+          Favourites
+        </h1>
+      </div>
+
       {selectedTab === "search" && (
         <>
           <form onSubmit={(event) => handleSearchSubmit(event)}>
             <input
               type="text"
+              required
               placeholder="Enter a search term..."
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)} //update state with user input
-              required
             ></input>
-            <button type="submit">Submit</button>
+            <button type="submit">
+              <AiOutlineSearch size={40} />
+            </button>
           </form>
 
-          {recipes.map((recipe) => {
-            const isFavourite = favouriteRecipes.some(
-              (favRecipe) => recipe.id === favRecipe.id
-            );
+          <div className="recipe-grid">
+            {recipes.map((recipe) => {
+              const isFavourite = favouriteRecipes.some(
+                (favRecipe) => recipe.id === favRecipe.id
+              );
 
-            <RecipeCard
-              recipe={recipe}
-              onClick={() => setSelectedRecipe(recipe)}
-              onFavouriteButtonClick={
-                isFavourite ? addFavouriteRecipe : removeFavouriteRecipe
-              }
-              isFavourite={true}
-            />;
-          })}
+              return (
+                <RecipeCard
+                  recipe={recipe}
+                  onClick={() => setSelectedRecipe(recipe)}
+                  onFavouriteButtonClick={
+                    isFavourite ? removeFavouriteRecipe : addFavouriteRecipe
+                  }
+                  isFavourite={isFavourite}
+                />
+              );
+            })}
+          </div>
+
           <button className="view-more-button" onClick={handleViewMoreClick}>
             View More
           </button>
@@ -115,17 +136,18 @@ const App = () => {
       )}
 
       {selectedTab === "favourites" && (
-        <div>
+        <div className="recipe-grid">
           {favouriteRecipes.map((recipe) => (
             <RecipeCard
               recipe={recipe}
               onClick={() => setSelectedRecipe(recipe)}
-              onFavouriteButtonClick={() => removeFavouriteRecipe}
+              onFavouriteButtonClick={removeFavouriteRecipe}
               isFavourite={true}
             />
           ))}
         </div>
       )}
+
       {selectedRecipe ? (
         <RecipeModal
           recipeId={selectedRecipe.id.toString()}
