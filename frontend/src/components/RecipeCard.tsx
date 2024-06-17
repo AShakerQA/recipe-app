@@ -1,5 +1,6 @@
 import { AiFillHeart, AiOutlineHeart } from "react-icons/ai";
 import { Recipe } from "../types";
+
 interface Props {
   recipe: Recipe;
   onClick: () => void;

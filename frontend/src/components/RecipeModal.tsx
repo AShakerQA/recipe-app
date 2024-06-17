@@ -19,18 +19,20 @@ const RecipeModal = ({ recipeId, onClose }: Props) => {
         console.log(error);
       }
     };
+
     fetchRecipeSummary();
-  }, [recipeId]); //add dependency Array, useEffect logic runs anytime the recipeId changes
+  }, [recipeId]);
 
   if (!recipeSummary) {
     return <></>;
   }
+
   return (
     <>
       <div className="overlay"></div>
       <div className="modal">
         <div className="modal-content">
-          <div className="modal-content-header">
+          <div className="modal-header">
             <h2>{recipeSummary.title}</h2>
             <span className="close-btn" onClick={onClose}>
               &times;
