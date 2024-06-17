@@ -1,9 +1,11 @@
-import { useState, FormEvent, useRef } from "react";
+import { useState, FormEvent, useRef, useEffect } from "react";
 import * as api from "./api";
 import { Recipe } from "./types";
 import RecipeCard from "./components/RecipeCard";
 import "./App.css";
 import RecipeModal from "./components/RecipeModal";
+
+type Tabs = "search" | "favourites"; //only two types of tabs
 
 const App = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -11,7 +13,22 @@ const App = () => {
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | undefined>(
     undefined
   );
+  const [selectedTab, setSelectedTab] = useState<Tabs>("search");
+  const [favouriteRecipes, setFavouriteRecipes] = useState<Recipe[]>([]);
   const pageNumber = useRef(1); //don't want page to rerender when page changes
+
+  useEffect(() => {
+    const fetchFavouriteRecipes = async () => {
+      try {
+        const favouriteRecipes = await api.getFavouriteRecipes();
+        setFavouriteRecipes(favouriteRecipes.results);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchFavouriteRecipes();
+  }, []);
 
   const handleSearchSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -39,23 +56,45 @@ const App = () => {
 
   return (
     <div>
-      <form onSubmit={(event) => handleSearchSubmit(event)}>
-        <input
-          type="text"
-          placeholder="Enter a search term..."
-          value={searchTerm}
-          onChange={(event) => setSearchTerm(event.target.value)} //update state with user input
-          required
-        ></input>
-        <button type="submit">Submit</button>
-      </form>
+      <div className="tabs">
+        <h1 onClick={() => setSelectedTab("search")}>Recipe Search</h1>
+        <h1 onClick={() => setSelectedTab("favourites")}>Favourites</h1>
+      </div>
+      {selectedTab === "search" && (
+        <>
+          <form onSubmit={(event) => handleSearchSubmit(event)}>
+            <input
+              type="text"
+              placeholder="Enter a search term..."
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)} //update state with user input
+              required
+            ></input>
+            <button type="submit">Submit</button>
+          </form>
 
-      {recipes.map((recipe) => (
-        <RecipeCard recipe={recipe} onClick={() => setSelectedRecipe(recipe)} />
-      ))}
-      <button className="view-more-button" onClick={handleViewMoreClick}>
-        View More
-      </button>
+          {recipes.map((recipe) => (
+            <RecipeCard
+              recipe={recipe}
+              onClick={() => setSelectedRecipe(recipe)}
+            />
+          ))}
+          <button className="view-more-button" onClick={handleViewMoreClick}>
+            View More
+          </button>
+        </>
+      )}
+
+      {selectedTab === "favourites" && (
+        <div>
+          {favouriteRecipes.map((recipe) => (
+            <RecipeCard
+              recipe={recipe}
+              onClick={() => setSelectedRecipe(recipe)}
+            />
+          ))}
+        </div>
+      )}
       {selectedRecipe ? (
         <RecipeModal
           recipeId={selectedRecipe.id.toString()}
