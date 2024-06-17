@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import * as RecipeAPI from "./recipe-api";
-import { PrismaClient } from "@Prisma/client";
+import { PrismaClient } from "@prisma/client";
 
 const app = express();
 const prismaClient = new PrismaClient();
@@ -20,7 +20,6 @@ app.get("/api/recipes/search", async (req, res) => {
 });
 
 app.get("/api/recipes/:recipeId/summary", async (req, res) => {
-  //: means path param
   const recipeId = req.params.recipeId;
   const results = await RecipeAPI.getRecipeSummary(recipeId);
   return res.json(results);
@@ -58,9 +57,12 @@ app.get("/api/recipes/favourite", async (req, res) => {
 
 app.delete("/api/recipes/favourite", async (req, res) => {
   const recipeId = req.body.recipeId;
+
   try {
     await prismaClient.favouriteRecipes.delete({
-      where: { recipeId: recipeId },
+      where: {
+        recipeId: recipeId,
+      },
     });
     return res.status(204).send();
   } catch (error) {

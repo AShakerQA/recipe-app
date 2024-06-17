@@ -14,13 +14,10 @@ export const searchRecipes = async (searchTerm: string, page: number) => {
     number: "10",
     offset: (page * 10).toString(),
   };
-  //   console.log("abdul");
-  //   console.log(queryParams);
   url.search = new URLSearchParams(queryParams).toString(); //attach query params to end of url
 
   try {
     const searchResponse = await fetch(url);
-    // console.log(searchResponse);
     const resultsJson = await searchResponse.json();
     return resultsJson;
   } catch (error) {
@@ -36,20 +33,15 @@ export const getRecipeSummary = async (recipeId: string) => {
   const baseUrl = new URL(
     `https://api.spoonacular.com/recipes/${recipeId}/summary`
   );
-
   const queryParams = {
     apiKey: apiKey,
   };
-
   baseUrl.search = new URLSearchParams(queryParams).toString();
 
-  try {
-    const response = await fetch(baseUrl);
-    const resultJson = await response.json();
-    return resultJson;
-  } catch (error) {
-    console.log(error);
-  }
+  const response = await fetch(baseUrl);
+  const json = await response.json();
+
+  return json;
 };
 
 export const getFavouriteRecipesByIDs = async (ids: string[]) => {
@@ -64,14 +56,10 @@ export const getFavouriteRecipesByIDs = async (ids: string[]) => {
     apiKey: apiKey,
     ids: ids.join(","), //structure API endpoint requires
   };
-
   baseUrl.search = new URLSearchParams(queryParams).toString();
 
-  try {
-    const response = await fetch(baseUrl);
-    const resultJson = await response.json();
-    return { result: resultJson };
-  } catch (error) {
-    console.log(error);
-  }
+  const response = await fetch(baseUrl);
+  const json = await response.json();
+
+  return { results: json };
 };
